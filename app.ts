@@ -58,6 +58,7 @@ for await (const req of server) {
                     });
                 }
                 else if (isWebSocketCloseEvent(ev)) {
+                    chats.delete(code);
                     sockets.delete(uid);
                 }
             }
