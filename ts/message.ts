@@ -1,12 +1,12 @@
 class Message {
-    sender: string;
+    author: string;
     message: string;
-    date: Date;
+    time: string;
 
-    constructor (sender: string, message: string) {
-        this.sender = sender;
+    constructor (author: string, message: string) {
+        this.author = author;
         this.message = message;
-        this.date = new Date();
+        this.time = new Date().toTimeString();
     }
 }
 

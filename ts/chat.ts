@@ -1,14 +1,10 @@
-import { Message } from "./message.ts";
+import { WebSocket } from "https://deno.land/std@0.80.0/ws/mod.ts";
 
 class Chat {
-    messages: Message[];
+    sockets: WebSocket[];
 
     constructor () {
-        this.messages = [];
-    }
-
-    send(message: Message): void {
-        this.messages.push(message);
+        this.sockets = [];
     }
 }
 

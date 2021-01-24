@@ -18,17 +18,25 @@ for await (const req of server) {
     if (req.url === "/") {
         req.respond({
             status: 200,
-            body: await Deno.open("./public/index.html")
+            body: await Deno.open("./public/index/index.html")
         });
+        
     }
-    else if (new RegExp("^\\/\\?name=.{1,25}&code=.{4}$", "m").test(req.url)) {
+    else if (new RegExp("^\\/chat\\/chat.html\\?name=.{1,25}&code=.{4}$", "m").test(req.url)) {
         req.respond({
             status: 200,
-            body: await Deno.open("./public/....html")
+            body: await Deno.open("./public/chat/chat.html")
         });
     }
     else if (new RegExp("^\\/ws\\?name=.{1,25}&code=.{4}$", "m").test(req.url) && acceptable(req)) {
-        const temp = new URL("http://" + req.url);
+        const params = new URLSearchParams(req.url.slice(req.url.indexOf("?") + 1));
+        const name = params.get("name");
+        const code = params.get("code");
+        if (!name || !code) {
+            await req.respond({ status: 400 });
+            break;
+        }
+
         acceptWebSocket({
             conn: req.conn,
             bufReader: req.r,
@@ -38,25 +46,27 @@ for await (const req of server) {
             const uid = v4.generate();
             sockets.set(uid, ws);
 
+            if (!chats.has(code))
+                chats.set(code, new Chat());
+            chats.get(code)?.sockets.push(ws);
+
             for await (const ev of ws) {
-                if (isWebSocketCloseEvent(ev)) {
+                if (typeof ev === "string") { // Broadcast message to everyone
+                    chats.get(code)?.sockets.forEach((socket) => {
+                        const message = new Message(name, ev);
+                        socket.send(JSON.stringify(message));
+                    });
+                }
+                else if (isWebSocketCloseEvent(ev)) {
                     sockets.delete(uid);
                 }
             }
         });
     }
-    else if (req.url === "/script.js") {
+    else if (req.url.includes(".js") || req.url.includes(".css") || req.url.includes(".html")) {
         req.respond({
             status: 200,
-            body: await Deno.open("./public/script.js"),
-            headers: new Headers({ "Content-Type": "text/javascript" })
-        });
-    }
-    else if (req.url === "/style.css") {
-        req.respond({
-            status: 200,
-            body: await Deno.open("./public/style.css"),
-            headers: new Headers({ "Content-Type": "text/css" })
+            body: await Deno.open("./public" + req.url)
         });
     }
 }
