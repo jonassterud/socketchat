@@ -1,0 +1,13 @@
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+p.message span.author {
+    color: #00aeff;
+}
+
+p.message span.time  {
+    color: #a5a5a5;
+    font-size: 10px;
+}

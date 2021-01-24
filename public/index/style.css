@@ -6,20 +6,3 @@ form {
 form input {
     margin: 0px 0px 10px 0px;
 }
-
-input[type="text"] {
-    outline: none;
-    border: none;
-
-    color: #ffffff;
-    background-color: #3F4547;
-}
-
-input[type="text"]:hover {
-    outline: #ffffff23 solid 1px;
-}
-
-input[type="submit"], input[type="button"] {
-    margin: 10px 0px 0px 0px;
-    align-self: center;
-}
