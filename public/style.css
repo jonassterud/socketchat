@@ -1,0 +1,36 @@
+html, body {
+    display: flex;
+    justify-content: center;
+    margin: 40px 10px 40px 10px;
+    
+    background-color: #181a1b;
+    color: #ffffff;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 14px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+form input {
+    margin: 0px 0px 10px 0px;
+}
+
+input[type="text"] {
+    outline: none;
+    border: none;
+
+    color: #ffffff;
+    background-color: #3F4547;
+}
+
+input[type="text"]:hover {
+    outline: #ffffff23 solid 1px;
+}
+
+input[type="submit"], input[type="button"] {
+    margin: 10px 0px 0px 0px;
+    align-self: center;
+}
