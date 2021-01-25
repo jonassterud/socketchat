@@ -8,6 +8,7 @@ import { Message } from "./ts/message.ts";
 import { Chat } from "./ts/chat.ts";
 
 // Initiate server
+const colors = new Map<string, string>();
 const chats = new Map<string, Chat>();
 const server = serve({ port: 3000 });
 console.log("http://localhost:3000/");
@@ -56,19 +57,25 @@ for await (const req of server) {
             headers: req.headers
         }).then(async (ws: WebSocket) => {
             const uid = v4.generate();
+            
+            const possibleColors = ["#ff0000", "#ff6f00", "#ffeb00", "#51ff00", "#00ffc8", "#0095ff", "#ae00ff", "#ff00f3"];
+            if (!colors.has(uid))
+                colors.set(uid, possibleColors[Math.floor(Math.random() * possibleColors.length)]);
 
             if (!chats.has(code))
                 chats.set(code, new Chat());
             chats.get(code)?.sockets.set(uid, ws);
-            chats.get(code)?.broadcast(new Message(name, "connected"));
+            chats.get(code)?.broadcast(new Message(name, "connected", colors.get(uid) || "#ffffff"));
+
 
             for await (const ev of ws) {
                 if (typeof ev === "string") { // Broadcast message to everyone
-                    chats.get(code)?.broadcast(new Message(name, ev));
+                    chats.get(code)?.broadcast(new Message(name, ev, colors.get(uid) || "#ffffff"));
                 }
                 else if (isWebSocketCloseEvent(ev)) {
+                    colors.delete(uid);
                     chats.get(code)?.sockets.delete(uid);
-                    chats.get(code)?.broadcast(new Message(name, "disconnected"));
+                    chats.get(code)?.broadcast(new Message(name, "disconnected", colors.get(uid) || "#ffffff"));
                 }
             }
         });

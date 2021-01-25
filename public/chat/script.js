@@ -10,7 +10,7 @@ window.onload = () => {
 
     ws.onmessage = (ev) => {
         const evObj = JSON.parse(ev.data);
-        const element = `<p class="message"><span class="author">${evObj.author}</span>: <span class="content">${evObj.message}</span><br><span class="time">${evObj.time}</span></p>`;
+        const element = `<p class="message"><span class="author" style="color:${evObj.color};">${evObj.author}</span>: <span class="content">${evObj.message}</span><br><span class="time">${evObj.time}</span></p>`;
         messagesElement.innerHTML += element;
     }
 
