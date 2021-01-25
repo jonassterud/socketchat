@@ -1,5 +1,6 @@
 div#messages {
     width: 60%;
+    max-width: 700px;
 }
 
 p.message span.time  {
