@@ -1,10 +1,5 @@
-body {
-    display: flex;
-    flex-direction: column;
-}
-
-p.message span.author {
-    color: #00aeff;
+div#messages {
+    width: 60%;
 }
 
 p.message span.time  {
