@@ -6,7 +6,7 @@ class Message {
     constructor (author: string, message: string) {
         this.author = author;
         this.message = message;
-        this.time = new Date().toTimeString();
+        this.time = new Date().toTimeString().slice(0, 8);
     }
 }
 

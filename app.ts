@@ -9,7 +9,6 @@ import { Chat } from "./ts/chat.ts";
 
 // Initiate server
 const chats = new Map<string, Chat>();
-const sockets = new Map<string, WebSocket>();
 const server = serve({ port: 3000 });
 console.log("http://localhost:3000/");
 
@@ -20,12 +19,25 @@ for await (const req of server) {
             status: 200,
             body: await Deno.open("./public/index/index.html")
         });
-        
     }
-    else if (new RegExp("^\\/chat\\/chat.html\\?name=.{1,25}&code=.{4}$", "m").test(req.url)) {
+    else if (new RegExp("^\\/chat.html\\?name=.{1,25}&code=.{4}$", "m").test(req.url)) {
         req.respond({
             status: 200,
             body: await Deno.open("./public/chat/chat.html")
+        });
+    }
+    else if (req.url.includes(".js")) {
+        req.respond({
+            status: 200,
+            body: await Deno.open("./public" + req.url),
+            headers: new Headers({ "Content-Type": "application/javascript" })
+        });
+    }
+    else if (req.url.includes(".css")) {
+        req.respond({
+            status: 200,
+            body: await Deno.open("./public" + req.url),
+            headers: new Headers({ "Content-Type": "text/css" })
         });
     }
     else if (new RegExp("^\\/ws\\?name=.{1,25}&code=.{4}$", "m").test(req.url) && acceptable(req)) {
@@ -44,30 +56,21 @@ for await (const req of server) {
             headers: req.headers
         }).then(async (ws: WebSocket) => {
             const uid = v4.generate();
-            sockets.set(uid, ws);
 
             if (!chats.has(code))
                 chats.set(code, new Chat());
-            chats.get(code)?.sockets.push(ws);
+            chats.get(code)?.sockets.set(uid, ws);
+            chats.get(code)?.broadcast(new Message(name, "connected"));
 
             for await (const ev of ws) {
                 if (typeof ev === "string") { // Broadcast message to everyone
-                    chats.get(code)?.sockets.forEach((socket) => {
-                        const message = new Message(name, ev);
-                        socket.send(JSON.stringify(message));
-                    });
+                    chats.get(code)?.broadcast(new Message(name, ev));
                 }
                 else if (isWebSocketCloseEvent(ev)) {
-                    chats.delete(code);
-                    sockets.delete(uid);
+                    chats.get(code)?.sockets.delete(uid);
+                    chats.get(code)?.broadcast(new Message(name, "disconnected"));
                 }
             }
-        });
-    }
-    else if (req.url.includes(".js") || req.url.includes(".css") || req.url.includes(".html")) {
-        req.respond({
-            status: 200,
-            body: await Deno.open("./public" + req.url)
         });
     }
 }

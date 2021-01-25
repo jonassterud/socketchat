@@ -15,9 +15,11 @@ window.onload = () => {
     }
 
     ws.onopen = (_) => {
-        ws.send("connected");
         sendButton.onclick = () => {
-            ws.send(message.value);
+            if (message.value.length > 0) {
+                ws.send(message.value);
+                message.value = "";
+            }
         }
     }
 
