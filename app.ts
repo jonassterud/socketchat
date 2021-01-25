@@ -73,9 +73,9 @@ for await (const req of server) {
                     chats.get(code)?.broadcast(new Message(name, ev, colors.get(uid) || "#ffffff"));
                 }
                 else if (isWebSocketCloseEvent(ev)) {
-                    colors.delete(uid);
                     chats.get(code)?.sockets.delete(uid);
                     chats.get(code)?.broadcast(new Message(name, "disconnected", colors.get(uid) || "#ffffff"));
+                    colors.delete(uid);
                 }
             }
         });
